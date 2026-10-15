@@ -1,21 +1,17 @@
 import { PrismaClient } from "@prisma/client"; // Ensure Prisma Client is generated
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
+
+// Untuk Node.js environment (bukan edge/browser), Neon perlu WebSocket polyfill
+neonConfig.webSocketConstructor = ws;
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 function createPrismaClient() {
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: true },
-    max: 10,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 10000,
-  });
-
-  const adapter = new PrismaPg(pool);
+  const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
 
   return new PrismaClient({
     adapter,
@@ -26,5 +22,6 @@ function createPrismaClient() {
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
+
 
 
