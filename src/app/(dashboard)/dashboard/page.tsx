@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = "force-dynamic";
 async function getStats() {
+  "use cache";
   try {
     const [totalLaptops, brandsRaw, totalCriteria, totalPresets, totalHistory] =
       await Promise.all([
