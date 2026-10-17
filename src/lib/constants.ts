@@ -45,8 +45,8 @@ export const DEFAULT_CRITERIA = [
     name: "Harga Laptop",
     weight: 0.30,
     attrType: "cost" as const,
-    description: "Harga laptop dalam euro (Price_euros). Semakin murah semakin baik.",
-    extractRule: "Diambil langsung dari kolom Price_euros dataset.",
+    description: "Harga laptop dalam Rupiah (dikonversi dari Euro). Semakin murah semakin baik.",
+    extractRule: "Diambil dari kolom Price_euros dataset, dikonversi ke Rupiah (1 EUR ≈ Rp17.000).",
   },
   {
     code: "C2",
@@ -84,14 +84,27 @@ export const DEFAULT_CRITERIA = [
   },
 ];
 
-// Format mata uang euro
-export function formatEuro(value: number): string {
-  return new Intl.NumberFormat("de-DE", {
+// Kurs konversi Euro ke Rupiah (perkiraan)
+export const EURO_TO_IDR = 17000;
+
+// Konversi harga Euro ke Rupiah
+export function euroToRupiah(euroValue: number): number {
+  return Math.round(euroValue * EURO_TO_IDR);
+}
+
+// Format mata uang Rupiah
+export function formatRupiah(value: number): string {
+  return new Intl.NumberFormat("id-ID", {
     style: "currency",
-    currency: "EUR",
+    currency: "IDR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(value);
+}
+
+// Format harga Euro ke Rupiah (shortcut)
+export function formatEuro(value: number): string {
+  return formatRupiah(euroToRupiah(value));
 }
 
 // Format angka dengan koma
