@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
     if (filtered.length === 0) {
       return NextResponse.json(
         {
-          error: `Tidak ada laptop dalam anggaran €${budgetMax}. Coba naikkan anggaran.`,
+          error: `Tidak ada laptop dalam anggaran Rp${(budgetMax! * 17000).toLocaleString("id-ID")}. Coba naikkan anggaran.`,
         },
         { status: 400 }
       );

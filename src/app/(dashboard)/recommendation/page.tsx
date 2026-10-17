@@ -44,7 +44,7 @@ const PRESET_ICONS: Record<string, string> = {
 };
 
 const CRITERIA_UNITS: Record<string, string> = {
-  C1: "€",
+  C1: "Rp",
   C2: "/100",
   C3: "GB",
   C4: "GB",
@@ -92,7 +92,8 @@ export default function RecommendationPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          budgetMax: budgetMax ? parseFloat(budgetMax) : null,
+          // Konversi budget dari Rupiah ke Euro (API masih pakai Euro)
+          budgetMax: budgetMax ? parseFloat(budgetMax) / 17000 : null,
           usageType: selectedPreset !== "custom" ? selectedPreset : null,
           customWeights: currentWeights,
           topN,
@@ -233,13 +234,13 @@ export default function RecommendationPage() {
             <h2 className="text-sm font-bold text-slate-800">Parameter Pencarian</h2>
             <div>
               <label className="text-xs text-slate-600 font-medium block mb-1.5">
-                Budget Maksimal (€) — kosongkan untuk semua harga
+                Budget Maksimal (Rp) — kosongkan untuk semua harga
               </label>
               <input
                 type="number"
                 value={budgetMax}
                 onChange={(e) => setBudgetMax(e.target.value)}
-                placeholder="Contoh: 1000"
+                placeholder="Contoh: 15000000"
                 className="w-full border border-slate-200 rounded-xl px-3 py-2 text-sm text-slate-700 outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
               />
             </div>

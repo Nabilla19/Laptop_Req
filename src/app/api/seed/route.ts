@@ -1,16 +1,15 @@
 /**
  * POST /api/seed
  *
- * Membaca file laptop_price.csv dari folder public/,
+ * Membaca file laptop_price.csv dari public/ via HTTP fetch
+ * (kompatibel dengan Vercel serverless — tidak pakai readFileSync),
  * mem-parsing setiap baris, lalu memasukkan data ke database.
  *
- * Endpoint ini HANYA untuk lingkungan development / setup awal.
+ * Endpoint ini untuk setup awal / reset data.
  * Gunakan environment variable SEED_SECRET untuk proteksi minimal.
  */
 
 import { NextRequest } from "next/server";
-import { readFileSync } from "fs";
-import { join } from "path";
 import Papa from "papaparse";
 import { prisma } from "@/lib/prisma";
 import {
@@ -36,16 +35,27 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    // ─── 1. Baca file CSV dari public/ ───────────────────────────────────────
-    const csvPath = join(process.cwd(), "public", "laptop_price.csv");
+    // ─── 1. Baca file CSV via HTTP fetch (works di Vercel & lokal) ────────────
+    // Di Vercel, file di public/ bisa diakses via URL publik deployment.
+    // Di lokal, kita gunakan BASE_URL atau fallback ke localhost.
+    const baseUrl =
+      process.env.NEXT_PUBLIC_BASE_URL ??
+      process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : `http://localhost:${process.env.PORT ?? 3000}`;
+
+    const csvUrl = `${baseUrl}/laptop_price.csv`;
     let csvText: string;
     try {
-      csvText = readFileSync(csvPath, "utf-8");
-    } catch {
+      const csvRes = await fetch(csvUrl, { cache: "no-store" });
+      if (!csvRes.ok) {
+        throw new Error(`HTTP ${csvRes.status}`);
+      }
+      csvText = await csvRes.text();
+    } catch (fetchErr) {
       return Response.json(
         {
-          error:
-            "File public/laptop_price.csv tidak ditemukan. Pastikan file sudah ada di folder public/.",
+          error: `Gagal mengambil file laptop_price.csv dari ${csvUrl}: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}. Pastikan file ada di folder public/ dan server berjalan.`,
         },
         { status: 404 }
       );
@@ -246,7 +256,8 @@ export async function GET() {
   return Response.json({
     endpoint: "POST /api/seed",
     description:
-      "Membaca public/laptop_price.csv dan memasukkan data ke database. Gunakan method POST untuk menjalankan seed.",
+      "Membaca public/laptop_price.csv via HTTP dan memasukkan data ke database. Gunakan method POST untuk menjalankan seed.",
     note: "Jika SEED_SECRET diset di environment, kirim header 'x-seed-secret' atau query param '?secret=...'",
+    howToSeed: "Set NEXT_PUBLIC_BASE_URL di Vercel environment variables dengan nilai URL deployment kamu (mis: https://spk-xxx.vercel.app)",
   });
 }

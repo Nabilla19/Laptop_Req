@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatEuro } from "@/lib/constants";
 
 // Data mock — akan diganti dengan fetch dari DB
 const MOCK_LAPTOPS = [
@@ -91,7 +92,7 @@ export default function LaptopsPage() {
                 Berat
               </th>
               <th className="text-right px-5 py-3.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">
-                Harga
+                Harga (IDR)
               </th>
             </tr>
           </thead>
@@ -137,7 +138,7 @@ export default function LaptopsPage() {
                     </span>
                   </td>
                   <td className="px-5 py-4 text-right">
-                    <span className="font-bold text-slate-800">€{laptop.price.toLocaleString("de-DE")}</span>
+                    <span className="font-bold text-slate-800">{formatEuro(laptop.price)}</span>
                   </td>
                 </tr>
               );
@@ -166,7 +167,7 @@ export default function LaptopsPage() {
 
       {/* Note */}
       <p className="mt-4 text-xs text-slate-400 text-center">
-        Data bersumber dari Kaggle &quot;Laptop Price Dataset&quot; — 1.303 baris, 13 kolom. Harga dalam Euro (€).
+        Data bersumber dari Kaggle &quot;Laptop Price Dataset&quot; — 1.303 baris, 13 kolom. Harga dikonversi ke Rupiah (1 EUR ≈ Rp17.000).
       </p>
     </div>
   );
