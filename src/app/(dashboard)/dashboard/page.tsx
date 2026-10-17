@@ -79,12 +79,10 @@ export default async function DashboardPage() {
           <div>
             <p className="text-sm font-semibold text-amber-800">Database belum di-seed</p>
             <p className="text-xs text-amber-700 mt-0.5">
-              Belum ada data laptop di database. Pergi ke{" "}
-              <Link href="/settings" className="underline font-medium">
-                Pengaturan
-              </Link>{" "}
-              dan jalankan Seed untuk mengisi data dari{" "}
-              <code className="bg-amber-100 px-1 rounded">public/laptop_price.csv</code>.
+              Belum ada data laptop di database. Jalankan seed dengan mengakses{" "}
+              <code className="bg-amber-100 px-1 rounded">POST /api/seed</code>{" "}
+              untuk mengisi data dari{" "}
+              <code className="bg-amber-100 px-1 rounded">laptop_price.csv</code>.
             </p>
           </div>
         </div>

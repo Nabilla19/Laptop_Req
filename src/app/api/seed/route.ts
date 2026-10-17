@@ -37,28 +37,35 @@ export async function POST(request: NextRequest) {
   try {
     // ─── 1. Baca file CSV via HTTP fetch (works di Vercel & lokal) ────────────
     // Di Vercel, file di public/ bisa diakses via URL publik deployment.
-    // Di lokal, kita gunakan BASE_URL atau fallback ke localhost.
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL ??
-      process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : `http://localhost:${process.env.PORT ?? 3000}`;
-
+    // Di Vercel, file public/ bisa diakses via URL.
+    // Di lokal, kita derive base URL dari request URL itu sendiri.
+    const requestUrl = new URL(request.url);
+    const baseUrl = `${requestUrl.protocol}//${requestUrl.host}`;
     const csvUrl = `${baseUrl}/laptop_price.csv`;
+
     let csvText: string;
     try {
+      // Coba via HTTP fetch dulu (works di semua environment)
       const csvRes = await fetch(csvUrl, { cache: "no-store" });
       if (!csvRes.ok) {
-        throw new Error(`HTTP ${csvRes.status}`);
+        throw new Error(`HTTP ${csvRes.status} dari ${csvUrl}`);
       }
       csvText = await csvRes.text();
     } catch (fetchErr) {
-      return Response.json(
-        {
-          error: `Gagal mengambil file laptop_price.csv dari ${csvUrl}: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}. Pastikan file ada di folder public/ dan server berjalan.`,
-        },
-        { status: 404 }
-      );
+      // Fallback: baca langsung dari filesystem (hanya di Node.js / lokal)
+      try {
+        const { readFileSync } = await import("fs");
+        const { join } = await import("path");
+        const csvPath = join(process.cwd(), "public", "laptop_price.csv");
+        csvText = readFileSync(csvPath, "utf-8");
+      } catch {
+        return Response.json(
+          {
+            error: `Gagal mengambil laptop_price.csv. HTTP: ${fetchErr instanceof Error ? fetchErr.message : String(fetchErr)}. Pastikan file ada di public/ dan NEXT_PUBLIC_BASE_URL diset di environment Vercel.`,
+          },
+          { status: 404 }
+        );
+      }
     }
 
     // ─── 2. Parse CSV ─────────────────────────────────────────────────────────
