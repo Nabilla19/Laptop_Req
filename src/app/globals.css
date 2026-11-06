@@ -1,26 +1,323 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   NEO-BRUTALISM LIGHT THEME — DESIGN TOKENS
+   ============================================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core Colors */
+  --color-bg: #F8F7F2;
+  --color-surface: #FFFFFF;
+  --color-text: #171717;
+  --color-text-secondary: #666666;
+  --color-border: #171717;
+  --color-border-subtle: #D6D3CB;
+  --color-muted: #858585;
+
+  /* Accent Colors */
+  --color-accent-primary: #F4D35E;   /* Butter Yellow */
+  --color-accent-success: #B8E0D2;   /* Mint Green */
+  --color-accent-warning: #FF9B85;   /* Soft Coral */
+  --color-accent-secondary: #C9B8F5; /* Lavender */
+
+  /* Neutrals */
+  --color-white: #FFFFFF;
+  --color-gray-light: #EAE8E1;
+  --color-gray-medium: #D6D3CB;
+  --color-black: #171717;
+
+  /* Shadows — Hard, 0 blur, Neo-Brutalist */
+  --shadow-sm: 3px 3px 0px #171717;
+  --shadow-md: 4px 4px 0px #171717;
+  --shadow-lg: 6px 6px 0px #171717;
+  --shadow-xl: 8px 8px 0px #171717;
+
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 10px;
+
+  /* Transitions */
+  --transition-fast: 120ms ease;
+  --transition-normal: 180ms ease;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-text);
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-space-grotesk);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ============================================================================
+   BASE STYLES
+   ============================================================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #F8F7F2;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #F8F7F2;
+  color: #171717;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings use Space Grotesk */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-space-grotesk), -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 700;
+  color: #171717;
+  line-height: 1.25;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+/* ============================================================================
+   NEO-BRUTALIST UTILITIES & COMPONENTS
+   ============================================================================ */
+
+/* Hard Shadows */
+.neo-shadow-sm {
+  box-shadow: 3px 3px 0px #171717;
+}
+
+.neo-shadow {
+  box-shadow: 4px 4px 0px #171717;
+}
+
+.neo-shadow-lg {
+  box-shadow: 6px 6px 0px #171717;
+}
+
+.neo-shadow-xl {
+  box-shadow: 8px 8px 0px #171717;
+}
+
+/* Cards */
+.neo-card {
+  background-color: #FFFFFF;
+  border: 2px solid #171717;
+  border-radius: 8px;
+  box-shadow: 4px 4px 0px #171717;
+}
+
+.neo-card-lg {
+  background-color: #FFFFFF;
+  border: 2px solid #171717;
+  border-radius: 8px;
+  box-shadow: 6px 6px 0px #171717;
+}
+
+/* Interactive Buttons */
+.neo-btn-primary {
+  font-family: var(--font-space-grotesk), sans-serif;
+  background-color: #171717;
+  color: #FFFFFF;
+  border: 2px solid #171717;
+  border-radius: 6px;
+  box-shadow: 3px 3px 0px #171717;
+  font-weight: 700;
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.neo-btn-primary:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #171717;
+  background-color: #000000;
+}
+
+.neo-btn-primary:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #171717;
+}
+
+.neo-btn-secondary {
+  font-family: var(--font-space-grotesk), sans-serif;
+  background-color: #FFFFFF;
+  color: #171717;
+  border: 2px solid #171717;
+  border-radius: 6px;
+  box-shadow: 3px 3px 0px #171717;
+  font-weight: 700;
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.neo-btn-secondary:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #171717;
+  background-color: #EAE8E1;
+}
+
+.neo-btn-secondary:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #171717;
+}
+
+.neo-btn-accent {
+  font-family: var(--font-space-grotesk), sans-serif;
+  background-color: #F4D35E;
+  color: #171717;
+  border: 2px solid #171717;
+  border-radius: 6px;
+  box-shadow: 3px 3px 0px #171717;
+  font-weight: 700;
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.neo-btn-accent:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #171717;
+  background-color: #ecd04e;
+}
+
+.neo-btn-accent:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #171717;
+}
+
+.neo-btn-coral {
+  font-family: var(--font-space-grotesk), sans-serif;
+  background-color: #FF9B85;
+  color: #171717;
+  border: 2px solid #171717;
+  border-radius: 6px;
+  box-shadow: 3px 3px 0px #171717;
+  font-weight: 700;
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.neo-btn-coral:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #171717;
+  background-color: #f78d75;
+}
+
+.neo-btn-coral:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #171717;
+}
+
+.neo-btn-mint {
+  font-family: var(--font-space-grotesk), sans-serif;
+  background-color: #B8E0D2;
+  color: #171717;
+  border: 2px solid #171717;
+  border-radius: 6px;
+  box-shadow: 3px 3px 0px #171717;
+  font-weight: 700;
+  transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+}
+
+.neo-btn-mint:hover:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #171717;
+  background-color: #a7d9c9;
+}
+
+.neo-btn-mint:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #171717;
+}
+
+/* Inputs & Form Elements */
+.neo-input {
+  background-color: #FFFFFF;
+  border: 2px solid #171717;
+  border-radius: 6px;
+  color: #171717;
+  font-size: 14px;
+  padding: 8px 12px;
+  outline: none;
+  transition: box-shadow 150ms ease, border-color 150ms ease;
+}
+
+.neo-input:focus {
+  border-color: #171717;
+  box-shadow: 3px 3px 0px #F4D35E;
+}
+
+/* Badges */
+.neo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border: 1.5px solid #171717;
+  border-radius: 4px;
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Range input styling */
+input[type="range"] {
+  accent-color: #171717;
+}
+
+/* ============================================================================
+   SCROLLBAR
+   ============================================================================ */
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F8F7F2;
+  border: 1px solid #171717;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #F4D35E;
+  border: 1.5px solid #171717;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #171717;
+}
+
+::selection {
+  background: #F4D35E;
+  color: #171717;
+}
+
+/* ============================================================================
+   FOCUS VISIBLE
+   ============================================================================ */
+
+*:focus-visible {
+  outline: 2px solid #171717 !important;
+  outline-offset: 2px !important;
+}
+
+/* ============================================================================
+   REDUCED MOTION
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

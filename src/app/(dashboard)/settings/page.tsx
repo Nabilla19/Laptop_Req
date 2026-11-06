@@ -1,6 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import {
+  Settings,
+  Sprout,
+  Check,
+  AlertTriangle,
+  FileSpreadsheet,
+  Paperclip,
+  Upload,
+} from "lucide-react";
 
 type SeedStatus = "idle" | "loading" | "success" | "error";
 
@@ -27,11 +36,11 @@ export default function SettingsPage() {
     try {
       const res = await fetch("/api/seed", { method: "POST" });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Seed gagal");
+      if (!res.ok) throw new Error(data.error ?? "Seed database gagal");
       setSeedResult(data);
       setSeedStatus("success");
     } catch (err) {
-      setSeedError(err instanceof Error ? err.message : "Seed gagal");
+      setSeedError(err instanceof Error ? err.message : "Seed database gagal");
       setSeedStatus("error");
     }
   };
@@ -46,117 +55,129 @@ export default function SettingsPage() {
       form.append("file", importFile);
       const res = await fetch("/api/import", { method: "POST", body: form });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Import gagal");
+      if (!res.ok) throw new Error(data.error ?? "Import file gagal");
       setImportResult(data);
       setImportStatus("success");
     } catch (err) {
-      setImportError(err instanceof Error ? err.message : "Import gagal");
+      setImportError(err instanceof Error ? err.message : "Import file gagal");
       setImportStatus("error");
     }
   };
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6">
       {/* Header */}
-      <div className="mb-8">
-        <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">
-          Konfigurasi
-        </p>
-        <h1 className="text-2xl font-bold text-slate-900">Pengaturan</h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Kelola data, seed database, dan impor dataset CSV
-        </p>
+      <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[10px] shadow-[6px_6px_0px_#171717] p-6 md:p-8">
+        <div>
+          <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-[#F4D35E] border border-[#171717] rounded-[4px] font-['Space_Grotesk',sans-serif] text-xs font-bold uppercase tracking-wider text-[#171717] mb-2">
+            <Settings size={14} strokeWidth={2.5} /> Konfigurasi Sistem
+          </div>
+          <h1 className="font-['Space_Grotesk',sans-serif] text-2xl md:text-3xl font-extrabold text-[#171717] uppercase tracking-tight">
+            Pengaturan &amp; Manajemen Data
+          </h1>
+          <p className="font-['Inter',sans-serif] text-xs md:text-sm text-[#666666] mt-1 max-w-2xl">
+            Inisialisasi dataset laptop melalui seed otomatis, upload file CSV eksternal, dan kelola konfigurasi sistem pendukung keputusan.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-6">
-        {/* Seed Section */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+        {/* Seed Database Section */}
+        <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-6">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center shrink-0">
-              <span className="text-indigo-600 text-lg">🌱</span>
+            <div className="w-11 h-11 bg-[#F4D35E] border-2 border-[#171717] rounded-[6px] shadow-[2px_2px_0px_#171717] flex items-center justify-center shrink-0 text-[#171717]">
+              <Sprout size={22} strokeWidth={2.5} />
             </div>
             <div className="flex-1">
-              <h2 className="text-sm font-bold text-slate-800 mb-1">Seed Database</h2>
-              <p className="text-xs text-slate-500 leading-relaxed mb-4">
-                Baca file <code className="bg-slate-100 px-1 rounded">public/laptop_price.csv</code> dan
-                masukkan data laptop, kriteria SAW, dan preset bobot ke database. Operasi ini{" "}
-                <strong>idempotent</strong> — aman dijalankan berulang kali.
+              <h2 className="font-['Space_Grotesk',sans-serif] text-base font-bold text-[#171717] mb-1">
+                Seed Database Otomatis
+              </h2>
+              <p className="font-['Inter',sans-serif] text-xs text-[#666666] leading-relaxed mb-4">
+                Membaca file dataset bawaan <code className="bg-[#EAE8E1] px-1.5 py-0.5 border border-[#171717] rounded font-mono text-[11px]">public/laptop_price.csv</code> dan menginisialisasi tabel laptop, kriteria SAW, serta preset profil ke database Neon PostgreSQL. Operasi ini bersifat <strong>idempotent</strong> (aman dijalankan berulang).
               </p>
 
               {seedStatus === "success" && seedResult && (
-                <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-                  <p className="text-sm font-medium text-emerald-700 mb-2">✓ {seedResult.message}</p>
-                  <div className="grid grid-cols-4 gap-3">
+                <div className="mb-4 bg-[#B8E0D2] border-2 border-[#171717] rounded-[6px] shadow-[3px_3px_0px_#171717] p-4">
+                  <p className="font-['Space_Grotesk',sans-serif] text-xs font-bold text-[#171717] mb-2 flex items-center gap-1.5">
+                    <Check size={14} strokeWidth={3} className="text-[#171717]" />
+                    <span>{seedResult.message}</span>
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-['Space_Grotesk',sans-serif]">
                     {[
-                      { label: "Total", value: seedResult.summary.totalRows },
-                      { label: "Berhasil", value: seedResult.summary.imported },
+                      { label: "Total Baris", value: seedResult.summary.totalRows },
+                      { label: "Berhasil Diimpor", value: seedResult.summary.imported },
                       { label: "Dilewati", value: seedResult.summary.skipped },
                       { label: "Gagal", value: seedResult.summary.failed },
                     ].map((s) => (
-                      <div key={s.label} className="text-center">
-                        <div className="text-lg font-bold text-slate-700">{s.value.toLocaleString()}</div>
-                        <div className="text-xs text-slate-500">{s.label}</div>
+                      <div key={s.label} className="bg-[#FFFFFF] border border-[#171717] rounded-[4px] p-2 text-center">
+                        <div className="text-base font-black text-[#171717]">{s.value.toLocaleString()}</div>
+                        <div className="text-[10px] text-[#666666] font-bold uppercase">{s.label}</div>
                       </div>
                     ))}
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-2">Batch ID: {seedResult.batchId}</p>
+                  <p className="text-[10px] text-[#171717]/80 mt-2 font-mono">Batch ID: {seedResult.batchId}</p>
                 </div>
               )}
 
               {seedStatus === "error" && seedError && (
-                <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-4">
-                  <p className="text-sm text-red-700">⚠ {seedError}</p>
+                <div className="mb-4 bg-[#FF9B85] border-2 border-[#171717] rounded-[6px] shadow-[3px_3px_0px_#171717] p-3 text-xs font-bold text-[#171717] flex items-center gap-2">
+                  <AlertTriangle size={16} strokeWidth={2.5} className="shrink-0" />
+                  <span>{seedError}</span>
                 </div>
               )}
 
               <button
                 onClick={handleSeed}
                 disabled={seedStatus === "loading"}
-                className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                className="neo-btn-primary px-5 py-2.5 text-xs font-bold inline-flex items-center gap-2"
               >
                 {seedStatus === "loading" ? (
-                  <span className="flex items-center gap-2">
-                    <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
-                      <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round" className="opacity-75" />
-                    </svg>
-                    Seeding...
-                  </span>
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Menjalankan Seed Database...</span>
+                  </>
                 ) : (
-                  "Jalankan Seed"
+                  <>
+                    <Sprout size={14} />
+                    <span>Jalankan Seed Database</span>
+                  </>
                 )}
               </button>
             </div>
           </div>
         </div>
 
-        {/* Import CSV Section */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
+        {/* Manual CSV Import Section */}
+        <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-6">
           <div className="flex items-start gap-4">
-            <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
-              <span className="text-emerald-600 text-lg">📂</span>
+            <div className="w-11 h-11 bg-[#B8E0D2] border-2 border-[#171717] rounded-[6px] shadow-[2px_2px_0px_#171717] flex items-center justify-center shrink-0 text-[#171717]">
+              <FileSpreadsheet size={22} strokeWidth={2.5} />
             </div>
             <div className="flex-1">
-              <h2 className="text-sm font-bold text-slate-800 mb-1">Import CSV</h2>
-              <p className="text-xs text-slate-500 leading-relaxed mb-4">
-                Upload file CSV laptop dataset secara manual. File harus berformat{" "}
-                <code className="bg-slate-100 px-1 rounded">.csv</code> (maks 10 MB) dengan kolom:{" "}
-                <code className="text-[11px]">Company, Product, Ram, Memory, Weight, Price_euros</code> (wajib).
+              <h2 className="font-['Space_Grotesk',sans-serif] text-base font-bold text-[#171717] mb-1">
+                Import File Dataset CSV Kustom
+              </h2>
+              <p className="font-['Inter',sans-serif] text-xs text-[#666666] leading-relaxed mb-4">
+                Unggah file CSV baru untuk menambahkan atau memperbarui katalog alternatif laptop. File harus berekstensi <code className="bg-[#EAE8E1] px-1.5 py-0.5 border border-[#171717] rounded font-mono text-[11px]">.csv</code> (maksimal 10 MB) dengan kolom:{" "}
+                <code className="text-[11px] font-bold">Company, Product, Ram, Memory, Weight, Price_euros</code>.
               </p>
 
               {importStatus === "success" && importResult && (
-                <div className="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-                  <p className="text-sm font-medium text-emerald-700 mb-2">✓ {importResult.message}</p>
-                  <div className="grid grid-cols-4 gap-3">
+                <div className="mb-4 bg-[#B8E0D2] border-2 border-[#171717] rounded-[6px] shadow-[3px_3px_0px_#171717] p-4">
+                  <p className="font-['Space_Grotesk',sans-serif] text-xs font-bold text-[#171717] mb-2 flex items-center gap-1.5">
+                    <Check size={14} strokeWidth={3} className="text-[#171717]" />
+                    <span>{importResult.message}</span>
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 font-['Space_Grotesk',sans-serif]">
                     {[
-                      { label: "Total", value: importResult.summary.totalRows },
-                      { label: "Berhasil", value: importResult.summary.imported },
+                      { label: "Total Baris", value: importResult.summary.totalRows },
+                      { label: "Berhasil Diimpor", value: importResult.summary.imported },
                       { label: "Dilewati", value: importResult.summary.skipped },
                       { label: "Gagal", value: importResult.summary.failed },
                     ].map((s) => (
-                      <div key={s.label} className="text-center">
-                        <div className="text-lg font-bold text-slate-700">{s.value.toLocaleString()}</div>
-                        <div className="text-xs text-slate-500">{s.label}</div>
+                      <div key={s.label} className="bg-[#FFFFFF] border border-[#171717] rounded-[4px] p-2 text-center">
+                        <div className="text-base font-black text-[#171717]">{s.value.toLocaleString()}</div>
+                        <div className="text-[10px] text-[#666666] font-bold uppercase">{s.label}</div>
                       </div>
                     ))}
                   </div>
@@ -164,8 +185,9 @@ export default function SettingsPage() {
               )}
 
               {importStatus === "error" && importError && (
-                <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-4">
-                  <p className="text-sm text-red-700">⚠ {importError}</p>
+                <div className="mb-4 bg-[#FF9B85] border-2 border-[#171717] rounded-[6px] shadow-[3px_3px_0px_#171717] p-3 text-xs font-bold text-[#171717] flex items-center gap-2">
+                  <AlertTriangle size={16} strokeWidth={2.5} className="shrink-0" />
+                  <span>{importError}</span>
                 </div>
               )}
 
@@ -182,31 +204,34 @@ export default function SettingsPage() {
                       setImportError(null);
                     }}
                   />
-                  <span className="inline-flex items-center gap-2 px-4 py-2.5 border border-slate-200 text-slate-700 text-sm font-medium rounded-xl hover:bg-slate-50 transition-colors cursor-pointer">
-                    📎 {importFile ? importFile.name : "Pilih File CSV"}
+                  <span className="neo-btn-secondary px-4 py-2.5 text-xs inline-flex items-center gap-2 cursor-pointer">
+                    <Paperclip size={14} />
+                    <span>{importFile ? importFile.name : "Pilih Berkas CSV..."}</span>
                   </span>
                 </label>
+
                 {importFile && (
                   <button
                     onClick={handleImport}
                     disabled={importStatus === "loading"}
-                    className="px-5 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 disabled:opacity-50 transition-colors"
+                    className="neo-btn-accent px-5 py-2.5 text-xs font-bold inline-flex items-center gap-2"
                   >
                     {importStatus === "loading" ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                          <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
-                          <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round" className="opacity-75" />
-                        </svg>
-                        Mengimport...
-                      </span>
+                      <>
+                        <div className="w-3.5 h-3.5 border-2 border-[#171717] border-t-transparent rounded-full animate-spin" />
+                        <span>Mengimpor Data...</span>
+                      </>
                     ) : (
-                      "Upload & Import"
+                      <>
+                        <Upload size={14} />
+                        <span>Upload &amp; Mulai Import</span>
+                      </>
                     )}
                   </button>
                 )}
+
                 {importFile && (
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs font-mono font-medium text-[#666666]">
                     {(importFile.size / 1024).toFixed(1)} KB
                   </span>
                 )}
@@ -215,74 +240,76 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Info Cards */}
+        {/* API Endpoints & Tech Stack Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
-            <h3 className="text-xs font-bold text-slate-600 uppercase tracking-wide mb-3">
-              API Endpoints
+          {/* API Endpoints */}
+          <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-5">
+            <h3 className="font-['Space_Grotesk',sans-serif] text-xs font-bold uppercase tracking-wider text-[#666666] mb-3">
+              Daftar REST API Endpoints
             </h3>
             <div className="space-y-2">
               {[
-                { method: "GET", path: "/api/laptops", desc: "Daftar laptop (paginasi)" },
+                { method: "GET", path: "/api/laptops", desc: "Katalog laptop & paginasi" },
+                { method: "POST", path: "/api/laptops", desc: "Tambah unit laptop baru" },
                 { method: "GET", path: "/api/criteria", desc: "Kriteria & preset bobot" },
                 { method: "PUT", path: "/api/criteria", desc: "Update bobot kriteria" },
-                { method: "POST", path: "/api/recommendation", desc: "Jalankan kalkulasi SAW" },
-                { method: "GET", path: "/api/history", desc: "Riwayat rekomendasi" },
-                { method: "POST", path: "/api/import", desc: "Import CSV laptop" },
-                { method: "POST", path: "/api/seed", desc: "Seed dari public/laptop_price.csv" },
-                { method: "GET", path: "/api/stats", desc: "Statistik ringkasan" },
+                { method: "POST", path: "/api/recommendation", desc: "Kalkulasi ranking SAW" },
+                { method: "GET", path: "/api/history", desc: "Arsip log riwayat" },
+                { method: "POST", path: "/api/import", desc: "Impor file CSV eksternal" },
+                { method: "POST", path: "/api/seed", desc: "Seed dari berkas lokal" },
+                { method: "GET", path: "/api/stats", desc: "Statistik metrik sistem" },
               ].map((ep) => (
-                <div key={ep.path} className="flex items-center gap-2">
+                <div key={ep.path} className="flex items-center gap-2 text-xs">
                   <span
-                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                    className={`font-['Space_Grotesk',sans-serif] text-[10px] font-bold px-1.5 py-0.5 border border-[#171717] rounded-[3px] ${
                       ep.method === "GET"
-                        ? "bg-blue-100 text-blue-700"
+                        ? "bg-[#F4D35E] text-[#171717]"
                         : ep.method === "POST"
-                        ? "bg-emerald-100 text-emerald-700"
+                        ? "bg-[#B8E0D2] text-[#171717]"
                         : ep.method === "PUT"
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-red-100 text-red-600"
+                        ? "bg-[#C9B8F5] text-[#171717]"
+                        : "bg-[#FF9B85] text-[#171717]"
                     }`}
                   >
                     {ep.method}
                   </span>
-                  <code className="text-[11px] text-slate-600 font-mono">{ep.path}</code>
-                  <span className="text-[11px] text-slate-400 ml-auto">{ep.desc}</span>
+                  <code className="text-[11px] font-mono text-[#171717] font-semibold">{ep.path}</code>
+                  <span className="text-[11px] text-[#666666] ml-auto">{ep.desc}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-slate-900 rounded-2xl p-5 text-white">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3">
-              Tech Stack
+          {/* Tech Stack Specs */}
+          <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-5">
+            <h3 className="font-['Space_Grotesk',sans-serif] text-xs font-bold uppercase tracking-wider text-[#666666] mb-3">
+              Arsitektur &amp; Teknologi
             </h3>
             <div className="space-y-2">
               {[
-                { name: "Next.js 16", desc: "App Router + API Routes" },
-                { name: "Prisma ORM", desc: "Type-safe database access" },
-                { name: "PostgreSQL (Neon)", desc: "Serverless database" },
-                { name: "TailwindCSS v4", desc: "Utility-first styling" },
-                { name: "PapaParse", desc: "CSV parsing library" },
-                { name: "TypeScript", desc: "Static typing" },
+                { name: "Next.js 16 (App Router)", desc: "React Server & Client Components" },
+                { name: "Prisma ORM 7", desc: "Type-safe database mapping" },
+                { name: "PostgreSQL (Neon Serverless)", desc: "Relational cloud storage" },
+                { name: "TailwindCSS v4", desc: "Design tokens & utility styling" },
+                { name: "Neo-Brutalism Light Theme", desc: "High contrast & hard shadows" },
+                { name: "Space Grotesk + Inter", desc: "Typography hierarchy" },
               ].map((t) => (
-                <div key={t.name} className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-white">{t.name}</span>
-                  <span className="text-xs text-slate-400">{t.desc}</span>
+                <div key={t.name} className="flex items-center justify-between text-xs py-1 border-b border-[#EAE8E1] last:border-0">
+                  <span className="font-['Space_Grotesk',sans-serif] font-bold text-[#171717]">{t.name}</span>
+                  <span className="font-['Inter',sans-serif] text-[11px] text-[#666666]">{t.desc}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* About */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6">
-          <h3 className="text-sm font-bold text-slate-800 mb-2">Tentang Aplikasi</h3>
-          <p className="text-xs text-slate-500 leading-relaxed">
-            <strong>SPK Laptop</strong> adalah Sistem Pendukung Keputusan untuk memilih laptop terbaik
-            menggunakan metode <strong>Simple Additive Weighting (SAW)</strong>. Sistem ini mengevaluasi
-            laptop berdasarkan 5 kriteria: Harga (C1), Performa CPU (C2), RAM (C3), Kapasitas Penyimpanan
-            (C4), dan Berat (C5). Dataset bersumber dari Kaggle Laptop Price Dataset dengan 1.303 baris data.
+        {/* About Card */}
+        <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-6">
+          <h3 className="font-['Space_Grotesk',sans-serif] text-sm font-bold text-[#171717] uppercase tracking-wide mb-2">
+            Tentang Aplikasi SPK Rekomendasi Laptop
+          </h3>
+          <p className="font-['Inter',sans-serif] text-xs text-[#666666] leading-relaxed">
+            Sistem Pendukung Keputusan (SPK) pemilihan laptop ini dirancang untuk memudahkan mahasiswa, pekerja profesional, gamer, maupun desainer dalam menentukan pilihan laptop paling optimal. Dengan memanfaatkan metode <strong>Simple Additive Weighting (SAW)</strong>, sistem menormalisasi atribut matriks keputusan berdasarkan karakteristik benefit dan cost, kemudian menjumlahkan skor terbobot untuk menghasilkan rekomendasi objektif dan transparan.
           </p>
         </div>
       </div>

@@ -1,7 +1,25 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { formatEuro, CRITERIA_NAMES } from "@/lib/constants";
+import {
+  BarChart2,
+  RotateCcw,
+  AlertTriangle,
+  Laptop,
+  Tag,
+  SlidersHorizontal,
+  Layers,
+  FileText,
+  ArrowRight,
+  Sparkles,
+  Check,
+  GraduationCap,
+  Palette,
+  Gamepad2,
+  Plane,
+} from "lucide-react";
 
 interface StatsData {
   totalLaptops: number;
@@ -35,11 +53,19 @@ function formatDate(iso: string) {
 }
 
 const USAGE_LABELS: Record<string, string> = {
-  kuliah_umum: "🎓 Kuliah Umum",
-  pemrograman: "💻 Pemrograman",
-  desain_grafis: "🎨 Desain Grafis",
-  gaming: "🎮 Gaming",
-  mobilitas_tinggi: "✈️ Mobilitas Tinggi",
+  kuliah_umum: "Kuliah Umum",
+  pemrograman: "Pemrograman",
+  desain_grafis: "Desain Grafis",
+  gaming: "Gaming",
+  mobilitas_tinggi: "Mobilitas Tinggi",
+};
+
+const USAGE_ICONS: Record<string, React.ComponentType<{ size?: number; className?: string }>> = {
+  kuliah_umum: GraduationCap,
+  pemrograman: Laptop,
+  desain_grafis: Palette,
+  gaming: Gamepad2,
+  mobilitas_tinggi: Plane,
 };
 
 export default function ReportsPage() {
@@ -66,261 +92,309 @@ export default function ReportsPage() {
   }, [fetchStats]);
 
   return (
-    <div className="p-8 max-w-7xl">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-start justify-between mb-8">
-        <div>
-          <p className="text-xs text-slate-500 uppercase tracking-widest font-semibold mb-1">
-            Analitik
-          </p>
-          <h1 className="text-2xl font-bold text-slate-900">Laporan</h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Ringkasan statistik sistem dan aktivitas rekomendasi
-          </p>
+      <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[10px] shadow-[6px_6px_0px_#171717] p-6 md:p-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-[#F4D35E] border border-[#171717] rounded-[4px] font-['Space_Grotesk',sans-serif] text-xs font-bold uppercase tracking-wider text-[#171717] mb-2">
+              <BarChart2 size={14} strokeWidth={2.5} /> Analitik Sistem
+            </div>
+            <h1 className="font-['Space_Grotesk',sans-serif] text-2xl md:text-3xl font-extrabold text-[#171717] uppercase tracking-tight">
+              Laporan &amp; Ringkasan Statistik
+            </h1>
+            <p className="font-['Inter',sans-serif] text-xs md:text-sm text-[#666666] mt-1 max-w-2xl">
+              Tinjauan metrik dataset laptop, distribusi kriteria, performa kalkulasi, serta catatan metodologis algoritma SAW.
+            </p>
+          </div>
+          <button
+            onClick={fetchStats}
+            className="neo-btn-secondary px-4 py-2.5 text-xs font-bold inline-flex items-center gap-2 self-start md:self-auto"
+          >
+            <RotateCcw size={14} /> Segarkan Data
+          </button>
         </div>
-        <button
-          onClick={fetchStats}
-          className="text-xs px-4 py-2 border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-colors"
-        >
-          ↺ Refresh
-        </button>
       </div>
 
       {error && (
-        <div className="mb-5 bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
-          ⚠ {error}
+        <div className="bg-[#FF9B85] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-4 text-xs font-bold text-[#171717] flex items-center gap-3">
+          <AlertTriangle size={16} strokeWidth={2.5} className="shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {loading ? (
-        <div className="flex items-center justify-center h-48">
-          <svg className="w-8 h-8 animate-spin text-indigo-600" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
-            <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round" className="opacity-75" />
-          </svg>
+        <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-12 flex flex-col items-center justify-center">
+          <div className="w-10 h-10 border-4 border-[#171717] border-t-[#F4D35E] rounded-full animate-spin mb-3" />
+          <p className="font-['Space_Grotesk',sans-serif] text-sm font-bold text-[#171717]">
+            Menyusun laporan data...
+          </p>
         </div>
       ) : stats ? (
         <div className="space-y-6">
-          {/* Stat Grid */}
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          {/* 5 Metrics Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 md:gap-4">
             {[
               {
                 label: "Total Laptop",
                 value: stats.totalLaptops.toLocaleString("id-ID"),
-                sub: "dalam database",
-                color: "text-indigo-600",
-                bg: "bg-indigo-50",
+                sub: "unit dalam database",
+                color: "bg-[#F4D35E]", // Butter Yellow
+                Icon: Laptop,
               },
               {
-                label: "Merek",
+                label: "Merek Produsen",
                 value: stats.totalBrands.toString(),
-                sub: "brand berbeda",
-                color: "text-emerald-600",
-                bg: "bg-emerald-50",
+                sub: "brand vendor unik",
+                color: "bg-[#B8E0D2]", // Mint Green
+                Icon: Tag,
               },
               {
-                label: "Kriteria",
+                label: "Kriteria SAW",
                 value: stats.totalCriteria.toString(),
-                sub: "C1 s/d C5",
-                color: "text-amber-600",
-                bg: "bg-amber-50",
+                sub: "C1 s/d C5 aktif",
+                color: "bg-[#C9B8F5]", // Lavender
+                Icon: SlidersHorizontal,
               },
               {
-                label: "Preset",
+                label: "Preset Profil",
                 value: stats.totalPresets.toString(),
-                sub: "profil bobot",
-                color: "text-violet-600",
-                bg: "bg-violet-50",
+                sub: "profil pembobotan",
+                color: "bg-[#FFFFFF]",
+                Icon: Layers,
               },
               {
-                label: "Sesi SAW",
+                label: "Sesi Selesai",
                 value: stats.totalHistory.toString(),
-                sub: "kalkulasi dijalankan",
-                color: "text-rose-600",
-                bg: "bg-rose-50",
+                sub: "kalkulasi dieksekusi",
+                color: "bg-[#FF9B85]", // Soft Coral
+                Icon: FileText,
               },
             ].map((s) => (
               <div
                 key={s.label}
-                className="bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-md transition-shadow"
+                className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-4 flex flex-col justify-between hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_#171717] transition-all"
               >
-                <div
-                  className={`inline-flex items-center justify-center w-10 h-10 rounded-xl ${s.bg} mb-3`}
-                >
-                  <span className={`text-xl font-bold ${s.color}`}>#</span>
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-['Space_Grotesk',sans-serif] text-[11px] font-bold uppercase tracking-wider text-[#666666]">
+                      {s.label}
+                    </span>
+                    <div
+                      className={`w-7 h-7 ${s.color} border border-[#171717] rounded-[4px] flex items-center justify-center text-[#171717]`}
+                    >
+                      <s.Icon size={14} strokeWidth={2.5} />
+                    </div>
+                  </div>
+                  <div className="font-['Space_Grotesk',sans-serif] text-2xl font-black text-[#171717]">
+                    {s.value}
+                  </div>
                 </div>
-                <div className={`text-3xl font-bold ${s.color}`}>{s.value}</div>
-                <div className="text-sm font-medium text-slate-700 mt-1">{s.label}</div>
-                <div className="text-xs text-slate-400 mt-0.5">{s.sub}</div>
+                <div className="font-['Inter',sans-serif] text-[11px] text-[#666666] mt-2 pt-2 border-t border-[#EAE8E1]">
+                  {s.sub}
+                </div>
               </div>
             ))}
           </div>
 
-          {/* Aktivitas Terbaru */}
-          {stats.latestHistory.length > 0 ? (
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-              <div className="px-5 py-4 border-b border-slate-100">
-                <h2 className="text-sm font-bold text-slate-800">5 Sesi Rekomendasi Terbaru</h2>
+          {/* Recent Recommendation Activity */}
+          <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] overflow-hidden">
+            <div className="p-4 border-b-2 border-[#171717] bg-[#F8F7F2] flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="font-['Space_Grotesk',sans-serif] text-sm font-bold text-[#171717] uppercase tracking-wide">
+                  5 Sesi Rekomendasi Terakhir
+                </span>
+                <span className="neo-badge bg-[#F4D35E] text-[#171717]">Terbaru</span>
               </div>
-              <div className="divide-y divide-slate-100">
+              <Link
+                href="/history"
+                className="font-['Space_Grotesk',sans-serif] text-xs font-bold text-[#171717] hover:underline inline-flex items-center gap-1"
+              >
+                Lihat Semua Riwayat <ArrowRight size={14} />
+              </Link>
+            </div>
+
+            {stats.latestHistory.length > 0 ? (
+              <div className="divide-y-2 divide-[#171717]">
                 {stats.latestHistory.map((h) => {
                   const weights = JSON.parse(h.weightsUsed) as Record<string, number>;
                   const topLaptop = h.items[0];
+
                   return (
-                    <div key={h.id} className="px-5 py-4 hover:bg-slate-50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
-                            <span className="text-indigo-600 text-xs font-bold">✦</span>
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-semibold text-slate-800">
-                                {topLaptop?.laptop
-                                  ? `${topLaptop.laptop.company} ${topLaptop.laptop.product}`
-                                  : "—"}
-                              </p>
-                              {h.usageType && (
-                                <span className="text-[11px] px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-full">
-                                  {USAGE_LABELS[h.usageType] ?? h.usageType}
-                                </span>
-                              )}
-                              {h.budgetMax && (
-                                <span className="text-[11px] px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">
-                                  ≤ {formatEuro(h.budgetMax)}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs text-slate-400 mt-0.5">
-                              {formatDate(h.calculatedAt)} · {h.totalAlternatives.toLocaleString()} alternatif
-                            </p>
-                          </div>
+                    <div
+                      key={h.id}
+                      className="p-4 hover:bg-[#F8F7F2] transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3"
+                    >
+                      <div className="flex items-start md:items-center gap-3">
+                        <div className="w-8 h-8 bg-[#F4D35E] border-2 border-[#171717] rounded-[4px] flex items-center justify-center shrink-0">
+                          <Sparkles size={16} strokeWidth={2.5} className="text-[#171717]" />
                         </div>
-                        {/* Weight pills */}
-                        <div className="flex gap-1.5">
-                          {Object.entries(weights).map(([code, w]) => (
-                            <div key={code} className="text-center">
-                              <div className="text-[9px] text-slate-400">{code}</div>
-                              <div className="text-[11px] font-bold text-slate-600">
-                                {(w * 100).toFixed(0)}%
-                              </div>
-                            </div>
-                          ))}
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                            <span className="font-['Space_Grotesk',sans-serif] text-xs font-bold text-[#171717]">
+                              {topLaptop?.laptop
+                                ? `${topLaptop.laptop.company} ${topLaptop.laptop.product}`
+                                : "—"}
+                            </span>
+                            {h.usageType && (
+                              <span className="neo-badge bg-[#B8E0D2] text-[#171717] inline-flex items-center gap-1">
+                                {USAGE_ICONS[h.usageType] && (() => {
+                                  const Icon = USAGE_ICONS[h.usageType];
+                                  return <Icon size={12} />;
+                                })()}
+                                {USAGE_LABELS[h.usageType] ?? h.usageType}
+                              </span>
+                            )}
+                            {h.budgetMax && (
+                              <span className="neo-badge bg-[#EAE8E1] text-[#171717]">
+                                ≤ {formatEuro(h.budgetMax)}
+                              </span>
+                            )}
+                          </div>
+                          <p className="font-['Inter',sans-serif] text-[11px] text-[#666666]">
+                            {formatDate(h.calculatedAt)} · {h.totalAlternatives.toLocaleString("id-ID")} alternatif diuji
+                          </p>
                         </div>
+                      </div>
+
+                      {/* Weight Mini Badges */}
+                      <div className="flex items-center gap-1.5 self-start md:self-auto border-t md:border-t-0 pt-2 md:pt-0 border-[#EAE8E1]">
+                        {Object.entries(weights).map(([code, w]) => (
+                          <div
+                            key={code}
+                            className="bg-[#FFFFFF] border border-[#171717] rounded-[3px] px-1.5 py-0.5 text-center"
+                          >
+                            <span className="text-[9px] text-[#666666] block leading-none">{code}</span>
+                            <span className="font-['Space_Grotesk',sans-serif] text-[10px] font-bold text-[#171717]">
+                              {(w * 100).toFixed(0)}%
+                            </span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   );
                 })}
               </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-2xl border border-dashed border-slate-300 p-8 text-center">
-              <p className="text-slate-500 text-sm">
-                Belum ada riwayat kalkulasi. Jalankan rekomendasi pertama di halaman{" "}
-                <a href="/recommendation" className="text-indigo-600 hover:underline">
-                  Rekomendasi
-                </a>
-                .
-              </p>
-            </div>
-          )}
+            ) : (
+              <div className="p-8 text-center text-xs text-[#666666]">
+                Belum ada riwayat kalkulasi tersimpan.
+              </div>
+            )}
+          </div>
 
-          {/* Kriteria Reference */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-5">
-            <h2 className="text-sm font-bold text-slate-800 mb-4">Referensi Kriteria SAW</h2>
+          {/* Reference Table for Criteria */}
+          <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-5">
+            <h2 className="font-['Space_Grotesk',sans-serif] text-sm font-bold text-[#171717] uppercase tracking-wide mb-3">
+              Kamus &amp; Definisi Kriteria SAW
+            </h2>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full text-xs text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-100 bg-slate-50">
-                    {["Kode", "Nama", "Tipe", "Deskripsi"].map((h) => (
-                      <th
-                        key={h}
-                        className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide"
-                      >
-                        {h}
-                      </th>
-                    ))}
+                  <tr className="border-b-2 border-[#171717] bg-[#F8F7F2]">
+                    <th className="p-2.5 font-['Space_Grotesk',sans-serif] font-bold">Kode</th>
+                    <th className="p-2.5 font-['Space_Grotesk',sans-serif] font-bold">Nama Kriteria</th>
+                    <th className="p-2.5 font-['Space_Grotesk',sans-serif] font-bold text-center">Tipe</th>
+                    <th className="p-2.5 font-['Space_Grotesk',sans-serif] font-bold">Deskripsi Atribut</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {Object.entries(CRITERIA_NAMES).map(([code, name]) => (
-                    <tr key={code} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-3">
-                        <span className="text-xs font-bold px-2 py-0.5 bg-indigo-100 text-indigo-700 rounded-lg">
-                          {code}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-slate-700 font-medium text-xs">{name}</td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${
-                            code === "C1" || code === "C5"
-                              ? "bg-amber-100 text-amber-700"
-                              : "bg-emerald-100 text-emerald-700"
-                          }`}
-                        >
-                          {code === "C1" || code === "C5" ? "Cost" : "Benefit"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-slate-500">
-                        {code === "C1" && "Harga laptop dalam euro. Semakin murah semakin baik."}
-                        {code === "C2" && "Skor performa CPU (0–100). Semakin tinggi semakin baik."}
-                        {code === "C3" && "Kapasitas RAM dalam GB. Semakin besar semakin baik."}
-                        {code === "C4" && "Total kapasitas penyimpanan dalam GB."}
-                        {code === "C5" && "Berat laptop dalam kg. Semakin ringan semakin baik."}
-                      </td>
-                    </tr>
-                  ))}
+                <tbody className="divide-y border-b border-[#171717]">
+                  {Object.entries(CRITERIA_NAMES).map(([code, name]) => {
+                    const isCost = code === "C1" || code === "C5";
+                    return (
+                      <tr key={code} className="hover:bg-[#F8F7F2]">
+                        <td className="p-2.5 font-bold font-['Space_Grotesk',sans-serif]">
+                          <span className="px-2 py-0.5 bg-[#F4D35E] border border-[#171717] rounded-[4px]">
+                            {code}
+                          </span>
+                        </td>
+                        <td className="p-2.5 font-bold text-[#171717]">{name}</td>
+                        <td className="p-2.5 text-center">
+                          <span
+                            className={`neo-badge ${
+                              isCost ? "bg-[#FF9B85] text-[#171717]" : "bg-[#B8E0D2] text-[#171717]"
+                            }`}
+                          >
+                            {isCost ? "COST (↓)" : "BENEFIT (↑)"}
+                          </span>
+                        </td>
+                        <td className="p-2.5 text-[#666666]">
+                          {code === "C1" && "Harga laptop dalam Euro (€). Semakin murah harga alternatif, semakin tinggi nilai preferensinya."}
+                          {code === "C2" && "Skor heuristik prosesor (0–100) berdasarkan generasi & frekuensi CPU. Semakin tinggi semakin baik."}
+                          {code === "C3" && "Kapasitas RAM dalam Gigabyte (GB). Semakin besar RAM semakin tinggi kemampuan multitasking."}
+                          {code === "C4" && "Total kapasitas media penyimpanan dalam Gigabyte (GB). Semakin lega kapasitas semakin baik."}
+                          {code === "C5" && "Berat fisik laptop dalam Kilogram (kg). Semakin ringan semakin tinggi nilai portabilitasnya."}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
           </div>
 
-          {/* Formula Box */}
+          {/* Formula & Method Notes */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="bg-slate-900 rounded-2xl p-6 text-white">
-              <h3 className="text-sm font-bold mb-4">Formula Normalisasi SAW</h3>
-              <div className="space-y-3 font-mono text-sm">
-                <div className="bg-slate-800 rounded-xl p-3">
-                  <p className="text-slate-400 text-xs mb-1">Benefit Criteria:</p>
-                  <p className="text-emerald-400">r_ij = x_ij / max(x_j)</p>
+            {/* Mathematical Model */}
+            <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-5">
+              <h3 className="font-['Space_Grotesk',sans-serif] text-sm font-bold text-[#171717] uppercase tracking-wide mb-3 flex items-center gap-2">
+                <span className="w-5 h-5 bg-[#F4D35E] border border-[#171717] rounded-[4px] flex items-center justify-center font-bold text-xs">
+                  ∑
+                </span>
+                Model Matematis SAW
+              </h3>
+
+              <div className="space-y-2.5 font-mono text-xs">
+                <div className="bg-[#F8F7F2] border border-[#171717] rounded-[6px] p-3">
+                  <p className="font-['Space_Grotesk',sans-serif] text-[10px] font-bold uppercase text-[#666666] mb-1">
+                    Normalisasi Benefit
+                  </p>
+                  <p className="font-bold text-[#171717]">r_ij = x_ij / max(x_j)</p>
                 </div>
-                <div className="bg-slate-800 rounded-xl p-3">
-                  <p className="text-slate-400 text-xs mb-1">Cost Criteria:</p>
-                  <p className="text-amber-400">r_ij = min(x_j) / x_ij</p>
+
+                <div className="bg-[#F8F7F2] border border-[#171717] rounded-[6px] p-3">
+                  <p className="font-['Space_Grotesk',sans-serif] text-[10px] font-bold uppercase text-[#666666] mb-1">
+                    Normalisasi Cost
+                  </p>
+                  <p className="font-bold text-[#171717]">r_ij = min(x_j) / x_ij</p>
                 </div>
-                <div className="bg-slate-800 rounded-xl p-3">
-                  <p className="text-slate-400 text-xs mb-1">SAW Score:</p>
-                  <p className="text-indigo-400">V_i = Σ(w_j × r_ij)</p>
+
+                <div className="bg-[#F4D35E] border border-[#171717] rounded-[6px] p-3">
+                  <p className="font-['Space_Grotesk',sans-serif] text-[10px] font-bold uppercase text-[#171717] mb-1">
+                    Skor Preferensi Terbobot (V_i)
+                  </p>
+                  <p className="font-bold text-[#171717]">V_i = ∑ (w_j × r_ij)</p>
                 </div>
               </div>
             </div>
-            <div className="bg-white rounded-2xl border border-slate-200 p-6">
-              <h3 className="text-sm font-bold text-slate-800 mb-4">Catatan Metode</h3>
-              <ul className="space-y-2 text-xs text-slate-600 leading-relaxed">
-                <li className="flex gap-2">
-                  <span className="text-indigo-500 mt-0.5">•</span>
+
+            {/* Methodological Notes */}
+            <div className="bg-[#FFFFFF] border-2 border-[#171717] rounded-[8px] shadow-[4px_4px_0px_#171717] p-5">
+              <h3 className="font-['Space_Grotesk',sans-serif] text-sm font-bold text-[#171717] uppercase tracking-wide mb-3">
+                Catatan Metodologis
+              </h3>
+              <ul className="space-y-2.5 text-xs text-[#666666]">
+                <li className="flex items-start gap-2">
+                  <span className="w-4 h-4 bg-[#B8E0D2] border border-[#171717] rounded-[3px] flex items-center justify-center shrink-0 mt-0.5">
+                    <Check size={10} strokeWidth={3} className="text-[#171717]" />
+                  </span>
                   <span>
-                    <strong>Simple Additive Weighting (SAW)</strong> adalah metode MCDM yang menjumlahkan nilai
-                    berbobot dari setiap kriteria.
+                    <strong>Simple Additive Weighting (SAW)</strong> dikenal sebagai metode penjumlahan terbobot. Konsep dasarnya adalah mencari penjumlahan terbobot dari rating kinerja pada setiap alternatif pada semua atribut.
                   </span>
                 </li>
-                <li className="flex gap-2">
-                  <span className="text-indigo-500 mt-0.5">•</span>
+                <li className="flex items-start gap-2">
+                  <span className="w-4 h-4 bg-[#B8E0D2] border border-[#171717] rounded-[3px] flex items-center justify-center shrink-0 mt-0.5">
+                    <Check size={10} strokeWidth={3} className="text-[#171717]" />
+                  </span>
                   <span>
-                    Skor CPU dihitung secara <strong>heuristik</strong> berdasarkan nama CPU — bukan benchmark resmi.
+                    Skor prosesor (C2) dihitung secara <strong>heuristik</strong> berbasis ekstraksi keluarga CPU, seri, dan clockspeed.
                   </span>
                 </li>
-                <li className="flex gap-2">
-                  <span className="text-indigo-500 mt-0.5">•</span>
-                  <span>
-                    Harga asli dalam <strong>Euro (€)</strong> dari dataset Kaggle Laptop Price Dataset.
+                <li className="flex items-start gap-2">
+                  <span className="w-4 h-4 bg-[#B8E0D2] border border-[#171717] rounded-[3px] flex items-center justify-center shrink-0 mt-0.5">
+                    <Check size={10} strokeWidth={3} className="text-[#171717]" />
                   </span>
-                </li>
-                <li className="flex gap-2">
-                  <span className="text-indigo-500 mt-0.5">•</span>
                   <span>
-                    Total bobot seluruh kriteria <strong>harus = 100%</strong> agar perhitungan valid.
+                    Total seluruh bobot kriteria harus tepat berjumlah <strong>1.0 (100%)</strong> agar hasil pemeringkatan proporsional dan tidak bias.
                   </span>
                 </li>
               </ul>

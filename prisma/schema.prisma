@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,31 +6,29 @@ datasource db {
   provider = "postgresql"
 }
 
-
 model Laptop {
-  id                String   @id @default(cuid())
-  laptopId          String?  @unique // ID dari dataset asli (jika ada)
-  company           String
-  product           String
-  typeName          String?
-  inches            Float?
-  screenResolution  String?
-  cpu               String?
-  ram               Int      // dalam GB
-  memory            String?  // nilai asli
-  storageGb         Int      // total kapasitas dalam GB
-  storageTypes      String?  // JSON: detail jenis penyimpanan
-  gpu               String?
-  opSys             String?
-  weight            Float    // dalam kg
-  priceEuros        Float    // harga asli dalam euro
-  cpuScore          Int?     // skor performa CPU (0-100), null = belum dihitung
-  cpuScoreMethod    String?  // "benchmark" | "heuristic" | "unknown"
-  isDemo            Boolean  @default(false)
-  importBatchId     String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
+  id                 String               @id @default(cuid())
+  laptopId           String?              @unique
+  company            String
+  product            String
+  typeName           String?
+  inches             Float?
+  screenResolution   String?
+  cpu                String?
+  ram                Int
+  memory             String?
+  storageGb          Int
+  storageTypes       String?
+  gpu                String?
+  opSys              String?
+  weight             Float
+  priceEuros         Float
+  cpuScore           Int?
+  cpuScoreMethod     String?
+  isDemo             Boolean              @default(false)
+  importBatchId      String?
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
   RecommendationItem RecommendationItem[]
 
   @@index([company])
@@ -44,65 +39,62 @@ model Laptop {
 
 model Criteria {
   id          String   @id @default(cuid())
-  code        String   @unique // C1, C2, C3, C4, C5
+  code        String   @unique
   name        String
-  weight      Float    // 0.0 - 1.0
-  attrType    String   // "benefit" | "cost"
+  weight      Float
+  attrType    String
   description String?
-  extractRule String?  // catatan aturan ekstraksi
+  extractRule String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model WeightPreset {
   id          String   @id @default(cuid())
-  name        String   @unique // kuliah_umum, pemrograman, dsb
+  name        String   @unique
   label       String
   description String?
-  weights     String   // JSON: { C1: 0.3, C2: 0.25, ... }
+  weights     String
   createdAt   DateTime @default(now())
 }
 
 model RecommendationHistory {
-  id              String   @id @default(cuid())
-  calculatedAt    DateTime @default(now())
-  budgetMax       Float?   // anggaran maksimal dalam euro, null = tidak difilter
-  usageType       String?  // kuliah_umum, pemrograman, dsb
-  screenPref      String?  // preferensi ukuran layar
-  priorityPref    String?  // "ringan" | "performa"
-  weightsUsed     String   // JSON snapshot bobot saat perhitungan
+  id                String               @id @default(cuid())
+  calculatedAt      DateTime             @default(now())
+  budgetMax         Float?
+  usageType         String?
+  screenPref        String?
+  priorityPref      String?
+  weightsUsed       String
   totalAlternatives Int
-  presetUsed      String?
-
-  items RecommendationItem[]
-
-  createdAt DateTime @default(now())
+  presetUsed        String?
+  createdAt         DateTime             @default(now())
+  items             RecommendationItem[]
 }
 
 model RecommendationItem {
-  id               String   @id @default(cuid())
+  id               String                @id @default(cuid())
   historyId        String
   laptopId         String
   rank             Int
   sawScore         Float
-  normalizedMatrix String   // JSON: nilai normalisasi per kriteria
-  weightedValues   String   // JSON: nilai bobot x normalisasi per kriteria
-  rawValues        String   // JSON: nilai asli per kriteria
-
-  history RecommendationHistory @relation(fields: [historyId], references: [id], onDelete: Cascade)
-  laptop  Laptop                @relation(fields: [laptopId], references: [id], onDelete: Cascade)
+  normalizedMatrix String
+  weightedValues   String
+  rawValues        String
+  history          RecommendationHistory @relation(fields: [historyId], references: [id], onDelete: Cascade)
+  laptop           Laptop                @relation(fields: [laptopId], references: [id], onDelete: Cascade)
 
   @@index([historyId])
   @@index([laptopId])
 }
 
 model ImportBatch {
-  id          String   @id @default(cuid())
-  filename    String
-  totalRows   Int
-  imported    Int
-  failed      Int
-  skipped     Int
-  failedRows  String?  // JSON: array detail baris gagal
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  filename   String
+  totalRows  Int
+  imported   Int
+  failed     Int
+  skipped    Int
+  failedRows String?
+  createdAt  DateTime @default(now())
 }
